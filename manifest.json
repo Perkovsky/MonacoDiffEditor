@@ -1,0 +1,19 @@
+{
+    "manifest_version": 2,
+    "name": "Monaco Diff Editor",
+    "description": "Side by side live comparison. Supports all languages out of the box.",
+    "version": "1.0",
+    "icons": {
+        "16": "images/icon16.png",
+        "32": "images/icon32.png",
+        "48": "images/icon48.png",
+        "96": "images/icon96.png"
+    },
+    "background": {
+        "scripts":[ "background.js"]
+    },
+    "browser_action": {
+        "default_icon": "images/icon16.png"
+    },
+    "content_security_policy": "script-src 'self' https://ajax.googleapis.com https://unpkg.com 'sha256-ZTO/bQOkiV9oHOAc4gKeEgnajw68IvKZLRFZAO1K440='; object-src 'self'"
+}
