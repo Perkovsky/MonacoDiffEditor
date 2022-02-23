@@ -1,0 +1,54 @@
+* {
+    font: 400 14px/1.4em 'Segoe UI','Open Sans',Calibri,Candara,Arial,sans-serif;
+}
+
+body, html {
+    height: 95%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+ label {
+    color: #555;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 20px;
+ }
+
+select {
+    color: #080808;
+    padding: 4px 6px;
+    border: 1px solid #bbb;
+    cursor: pointer;
+}
+
+button {
+    height: 100%;
+    width: 50px;
+    color: #080808;
+    border: 1px solid #bbb;
+    cursor: pointer;
+}
+
+footer {
+    padding: 1px 0;
+}
+
+.row {
+    display: flex;
+    padding: 10px 0;
+}
+
+.control-block {
+    padding: 0 10px;    
+}
+
+.text-center {
+    text-align: center;
+}
+
+#diff-editor {
+    height: 100%;
+    border: 1px solid #bbb;
+}

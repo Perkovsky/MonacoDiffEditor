@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monaco DiffEditor</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="row">
+        <div class="control-block">
+            <label class="control-label">Language</label>
+            <select class="language-picker"></select>
+        </div>
+        <div class="control-block">
+            <label class="control-label">Theme</label>
+            <select class="theme-picker">
+                <option>Visual Studio</option>
+                <option>Visual Studio Dark</option>
+                <option>High Contrast Dark</option>
+            </select>
+        </div>
+        <div class="control-block">
+            <button id="btn-next">Next</button>
+            <button id="btn-prev">Prev</button>
+        </div>
+    </div>
+
+    <div id="diff-editor"></div>
+
+    <footer>
+        <p class="text-center">
+            <small>© 2022 Igor Perkovsky</small>
+        </p>
+    </footer>
+    
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://unpkg.com/monaco-editor@latest/min/vs/loader.js"></script>
+    <script>
+        let diffEditor = null;
+        let leftDiffModel = null;
+        let rightDiffModel = null;
+        let diffNavigator = null;
+        
+        require.config({ paths: { 'vs': 'https://unpkg.com/monaco-editor@latest/min/vs' }});
+        window.MonacoEnvironment = { getWorkerUrl: () => proxy };
+
+        let proxy = URL.createObjectURL(new Blob([`
+            self.MonacoEnvironment = {
+                baseUrl: 'https://unpkg.com/monaco-editor@latest/min/'
+            };
+            importScripts('https://unpkg.com/monaco-editor@latest/min/vs/base/worker/workerMain.js');
+        `], { type: 'text/javascript' }));
+
+        require(["vs/editor/editor.main"], function () {
+            diffEditor = monaco.editor.createDiffEditor(document.getElementById('diff-editor'), {
+                originalEditable: true,
+                enableSplitViewResizing: true
+			});
+
+			leftDiffModel = monaco.editor.createModel('// Paste source code here', 'text/javascript');
+			rightDiffModel = monaco.editor.createModel('// Paste modified code here', 'text/javascript');
+
+			diffEditor.setModel({
+				original: leftDiffModel,
+				modified: rightDiffModel
+			});
+
+            diffNavigator = monaco.editor.createDiffNavigator(diffEditor, {
+                followsCaret: true,
+                ignoreCharChanges: true
+            });
+        });
+
+        function changeLanguage(mode) {
+            leftDiffModel.setMode(mode);
+            rightDiffModel.setMode(mode);
+            monaco.editor.setModelLanguage(leftDiffModel, mode);
+        }
+
+        function changeTheme(theme) {
+            let newTheme = theme === 1 ? 'vs-dark' : theme === 0 ? 'vs' : 'hc-black';
+            monaco.editor.setTheme(newTheme);
+        }
+
+        function next() {
+            diffNavigator.next();
+        }
+
+        function prev() {
+            diffNavigator.previous();
+        }
+
+        $(document).ready(function () {
+            require(['vs/editor/editor.main'], function () {
+                let MODES = (function () {
+                    let modesIds = monaco.languages.getLanguages().map(function (lang) {
+                        return lang.id;
+                    });
+                    modesIds.sort();
+                    return modesIds;
+                })();
+
+                let startModeIndex = 0;
+                for (let i = 0; i < MODES.length; i++) {
+                    let o = document.createElement('option');
+                    o.textContent = MODES[i];
+                    if (MODES[i] === 'javascript') {
+                        startModeIndex = i;
+                    }
+                    $('.language-picker').append(o);
+                }
+                $('.language-picker')[0].selectedIndex = startModeIndex;
+                
+                $('.language-picker').change(function () {
+                    changeLanguage(MODES[this.selectedIndex]);
+                });
+
+                $('.theme-picker').change(function () {
+                    changeTheme(this.selectedIndex);
+                });
+
+                $('#btn-next').click(function () {
+                    next();
+                });
+
+                $('#btn-prev').click(function () {
+                    prev();
+                });
+            });
+
+            window.onresize = function () {
+                if (diffEditor) {
+                    diffEditor.layout();
+                }
+            };
+        });
+    </script>
+</body>
+</html>
